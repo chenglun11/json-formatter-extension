@@ -1,9 +1,15 @@
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
   chrome.contextMenus.create({
     id: 'format-json',
     title: chrome.i18n.getMessage('contextMenuTitle'),
     contexts: ['selection']
   });
+
+  if (details.reason === 'install' || details.reason === 'update') {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('onboarding.html')
+    });
+  }
 });
 
 // 回退到新标签页打开 viewer.html

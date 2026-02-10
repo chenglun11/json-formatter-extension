@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JSON Formatter</title>
+  <link rel="stylesheet" href="onboarding.css">
+</head>
+<body>
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <span class="logo">{ }</span>
+      <h1>JSON Formatter</h1>
+      <span class="version" id="version"></span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h2 class="hero-title" data-i18n="onboardingWelcome"></h2>
+    <p class="hero-subtitle" data-i18n="onboardingSubtitle"></p>
+  </div>
+
+  <div class="features">
+    <!-- Card 1: Right-click format -->
+    <div class="card">
+      <h3 class="card-title" data-i18n="onboardingFeature1Title"></h3>
+      <p class="card-desc" data-i18n="onboardingFeature1Desc"></p>
+      <div class="card-demo demo-context-menu">
+        <div class="demo-page">
+          <div class="demo-text-line"></div>
+          <div class="demo-text-line demo-highlight"></div>
+          <div class="demo-text-line"></div>
+        </div>
+        <div class="demo-menu">
+          <div class="demo-menu-item"></div>
+          <div class="demo-menu-item"></div>
+          <div class="demo-menu-item demo-menu-active" data-i18n="contextMenuTitle"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Card 2: Floating window -->
+    <div class="card">
+      <div class="card-badge" data-i18n="onboardingNewBadge"></div>
+      <h3 class="card-title" data-i18n="onboardingFeature2Title"></h3>
+      <p class="card-desc" data-i18n="onboardingFeature2Desc"></p>
+      <div class="card-demo demo-floating">
+        <div class="demo-page-bg">
+          <div class="demo-text-line"></div>
+          <div class="demo-text-line"></div>
+          <div class="demo-text-line"></div>
+        </div>
+        <div class="demo-float-win">
+          <div class="demo-float-bar">
+            <span class="demo-float-title">{ } JSON</span>
+            <span class="demo-float-close">×</span>
+          </div>
+          <div class="demo-float-body">
+            <span class="demo-jk">"name"</span>: <span class="demo-js">"Alice"</span>,<br>
+            <span class="demo-jk">"age"</span>: <span class="demo-jn">30</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Expand / Collapse / Copy -->
+    <div class="card">
+      <h3 class="card-title" data-i18n="onboardingFeature3Title"></h3>
+      <p class="card-desc" data-i18n="onboardingFeature3Desc"></p>
+      <div class="card-demo demo-collapse">
+        <div class="demo-json-tree">
+          <div class="demo-tree-line">
+            <span class="demo-toggle">▶</span>
+            <span class="demo-jb">{</span>
+          </div>
+          <div class="demo-tree-children">
+            <div class="demo-tree-line indent">
+              <span class="demo-jk">"users"</span>: <span class="demo-jb">[</span>...<span class="demo-jb">]</span>
+            </div>
+            <div class="demo-tree-line indent">
+              <span class="demo-jk">"count"</span>: <span class="demo-jn">42</span>
+            </div>
+          </div>
+          <div class="demo-tree-line">
+            <span class="demo-jb">}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Auto theme -->
+    <div class="card">
+      <h3 class="card-title" data-i18n="onboardingFeature4Title"></h3>
+      <p class="card-desc" data-i18n="onboardingFeature4Desc"></p>
+      <div class="card-demo demo-theme">
+        <div class="demo-theme-panel demo-theme-dark">
+          <div class="demo-theme-bar-d"></div>
+          <div class="demo-theme-line-d"></div>
+          <div class="demo-theme-line-d short"></div>
+        </div>
+        <div class="demo-theme-panel demo-theme-light">
+          <div class="demo-theme-bar-l"></div>
+          <div class="demo-theme-line-l"></div>
+          <div class="demo-theme-line-l short"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <button class="cta-btn" id="cta-btn" data-i18n="onboardingCta"></button>
+  </div>
+
+  <footer class="footer">
+    <a href="https://github.com/chenglun11/json-formatter-extension" target="_blank" rel="noopener">
+      <svg class="icon-github" viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+      </svg>
+      GitHub
+    </a>
+    <span class="footer-sep">·</span>
+    <span data-i18n="footerMadeWith"></span>
+  </footer>
+  <script src="onboarding.js"></script>
+</body>
+</html>

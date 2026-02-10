@@ -70,5 +70,41 @@
   },
   "btnClose": {
     "message": "关闭"
+  },
+  "onboardingWelcome": {
+    "message": "欢迎使用 JSON Formatter！"
+  },
+  "onboardingSubtitle": {
+    "message": "快速格式化和查看 JSON 数据"
+  },
+  "onboardingFeature1Title": {
+    "message": "右键格式化"
+  },
+  "onboardingFeature1Desc": {
+    "message": "选中页面上的 JSON 文本，右键选择「格式化 JSON」即可快速格式化"
+  },
+  "onboardingFeature2Title": {
+    "message": "页内悬浮窗预览"
+  },
+  "onboardingFeature2Desc": {
+    "message": "在当前页面内以可拖拽悬浮窗查看格式化后的 JSON"
+  },
+  "onboardingFeature3Title": {
+    "message": "展开 / 折叠 / 复制"
+  },
+  "onboardingFeature3Desc": {
+    "message": "一键展开或折叠嵌套结构，轻松复制格式化结果"
+  },
+  "onboardingFeature4Title": {
+    "message": "自动主题"
+  },
+  "onboardingFeature4Desc": {
+    "message": "自动跟随系统偏好，在亮色和暗色主题之间无缝切换"
+  },
+  "onboardingNewBadge": {
+    "message": "新功能"
+  },
+  "onboardingCta": {
+    "message": "开始使用"
   }
 }

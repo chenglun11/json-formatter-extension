@@ -70,5 +70,41 @@
   },
   "btnClose": {
     "message": "Close"
+  },
+  "onboardingWelcome": {
+    "message": "Welcome to JSON Formatter!"
+  },
+  "onboardingSubtitle": {
+    "message": "Quickly format and view JSON data"
+  },
+  "onboardingFeature1Title": {
+    "message": "Right-Click to Format"
+  },
+  "onboardingFeature1Desc": {
+    "message": "Select any JSON text on a page, right-click and choose \"Format JSON\" to instantly format it"
+  },
+  "onboardingFeature2Title": {
+    "message": "In-Page Floating Window"
+  },
+  "onboardingFeature2Desc": {
+    "message": "View formatted JSON right on the current page in a draggable floating window"
+  },
+  "onboardingFeature3Title": {
+    "message": "Expand / Collapse / Copy"
+  },
+  "onboardingFeature3Desc": {
+    "message": "Expand or collapse nested structures with one click, and copy formatted results easily"
+  },
+  "onboardingFeature4Title": {
+    "message": "Auto Theme"
+  },
+  "onboardingFeature4Desc": {
+    "message": "Automatically switches between light and dark themes to match your system preference"
+  },
+  "onboardingNewBadge": {
+    "message": "NEW"
+  },
+  "onboardingCta": {
+    "message": "Get Started"
   }
 }
