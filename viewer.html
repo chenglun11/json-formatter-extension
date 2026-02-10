@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JSON Formatter</title>
+  <link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+  <div class="toolbar">
+    <h1>JSON Formatter</h1>
+    <div class="actions">
+      <button id="btn-expand" data-i18n="btnExpand" data-i18n-title="btnExpand"></button>
+      <button id="btn-collapse" data-i18n="btnCollapse" data-i18n-title="btnCollapse"></button>
+      <button id="btn-copy" data-i18n="btnCopy" data-i18n-title="btnCopyTitle"></button>
+      <button id="btn-raw" data-i18n="btnRaw" data-i18n-title="btnRawTitle"></button>
+    </div>
+  </div>
+  <div class="main">
+    <div id="error" class="error hidden"></div>
+    <pre id="output" class="output"></pre>
+    <textarea id="raw-input" class="raw-input hidden" data-i18n-placeholder="placeholder"></textarea>
+  </div>
+  <script src="viewer.js"></script>
+</body>
+</html>

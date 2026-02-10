@@ -1,0 +1,53 @@
+{
+  "extName": {
+    "message": "JSON Formatter"
+  },
+  "extDescription": {
+    "message": "Right-click selected text to format and view JSON"
+  },
+  "contextMenuTitle": {
+    "message": "Format JSON"
+  },
+  "btnExpand": {
+    "message": "Expand All"
+  },
+  "btnCollapse": {
+    "message": "Collapse All"
+  },
+  "btnCopy": {
+    "message": "Copy"
+  },
+  "btnCopyTitle": {
+    "message": "Copy formatted result"
+  },
+  "btnRaw": {
+    "message": "Raw Text"
+  },
+  "btnRawTitle": {
+    "message": "View raw text"
+  },
+  "btnFormatted": {
+    "message": "Formatted View"
+  },
+  "placeholder": {
+    "message": "Paste JSON here, press Ctrl+Enter to format"
+  },
+  "errorEmpty": {
+    "message": "No content to format"
+  },
+  "errorParse": {
+    "message": "JSON parse failed: $1",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
+  },
+  "copied": {
+    "message": "Copied to clipboard"
+  },
+  "items": {
+    "message": "$1 items",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
+  }
+}

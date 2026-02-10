@@ -1,0 +1,228 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 暗色主题（默认） */
+:root {
+  --bg: #1e1e2e;
+  --bg-toolbar: #181825;
+  --bg-input: #181825;
+  --bg-btn: #313244;
+  --bg-btn-hover: #45475a;
+  --bg-error: #45273a;
+  --bg-toast: #a6e3a1;
+  --text: #cdd6f4;
+  --text-title: #cba6f7;
+  --text-toast: #1e1e2e;
+  --border: #313244;
+  --border-btn: #45475a;
+  --border-btn-hover: #585b70;
+  --border-error: #f38ba8;
+  --color-error: #f38ba8;
+  --color-key: #89b4fa;
+  --color-string: #a6e3a1;
+  --color-number: #fab387;
+  --color-boolean: #cba6f7;
+  --color-null: #6c7086;
+  --color-bracket: #9399b2;
+  --color-toggle: #6c7086;
+}
+
+/* 亮色主题 */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f5f5f5;
+    --bg-toolbar: #ffffff;
+    --bg-input: #ffffff;
+    --bg-btn: #e8e8e8;
+    --bg-btn-hover: #d8d8d8;
+    --bg-error: #fde8e8;
+    --bg-toast: #16a34a;
+    --text: #1e1e2e;
+    --text-title: #7c3aed;
+    --text-toast: #ffffff;
+    --border: #d4d4d8;
+    --border-btn: #c4c4c8;
+    --border-btn-hover: #a1a1aa;
+    --border-error: #dc2626;
+    --color-error: #dc2626;
+    --color-key: #2563eb;
+    --color-string: #16a34a;
+    --color-number: #ea580c;
+    --color-boolean: #7c3aed;
+    --color-null: #9ca3af;
+    --color-bracket: #6b7280;
+    --color-toggle: #9ca3af;
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Menlo, monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: var(--bg-toolbar);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-title);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.actions button {
+  padding: 6px 14px;
+  border: 1px solid var(--border-btn);
+  border-radius: 6px;
+  background: var(--bg-btn);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.actions button:hover {
+  background: var(--bg-btn-hover);
+  border-color: var(--border-btn-hover);
+}
+
+.main {
+  padding: 20px 24px;
+}
+
+.error {
+  padding: 12px 16px;
+  background: var(--bg-error);
+  border: 1px solid var(--border-error);
+  border-radius: 8px;
+  color: var(--color-error);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.output {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.raw-input {
+  width: 100%;
+  min-height: 400px;
+  padding: 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+/* JSON 语法高亮 */
+.json-key {
+  color: var(--color-key);
+}
+
+.json-string {
+  color: var(--color-string);
+}
+
+.json-number {
+  color: var(--color-number);
+}
+
+.json-boolean {
+  color: var(--color-boolean);
+}
+
+.json-null {
+  color: var(--color-null);
+  font-style: italic;
+}
+
+.json-bracket {
+  color: var(--color-bracket);
+}
+
+/* 折叠功能 */
+.collapsible {
+  position: relative;
+}
+
+.collapse-toggle {
+  display: inline-block;
+  width: 16px;
+  font-size: 10px;
+  color: var(--color-toggle);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s;
+}
+
+.collapsible.collapsed > .collapse-toggle {
+  transform: rotate(-90deg);
+}
+
+.collapsible.collapsed > .json-content {
+  display: none;
+}
+
+.collapsible.collapsed > .json-placeholder {
+  display: inline;
+}
+
+.json-placeholder {
+  display: none;
+  color: var(--color-null);
+  font-style: italic;
+}
+
+.json-content {
+  display: inline;
+}
+
+/* 复制成功提示 */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 10px 20px;
+  background: var(--bg-toast);
+  color: var(--text-toast);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 100;
+}
+
+.toast.show {
+  opacity: 1;
+}
