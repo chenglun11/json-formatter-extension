@@ -12,6 +12,10 @@
     el.placeholder = msg(el.dataset.i18nPlaceholder);
   });
 
+  // 从 manifest.json 读取版本号
+  const manifest = chrome.runtime.getManifest();
+  document.getElementById('version').textContent = 'v' + manifest.version;
+
   const output = document.getElementById('output');
   const error = document.getElementById('error');
   const rawInput = document.getElementById('raw-input');

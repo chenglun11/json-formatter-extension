@@ -49,5 +49,8 @@
     "placeholders": {
       "1": { "content": "$1" }
     }
+  },
+  "footerMadeWith": {
+    "message": "Made with care for developers"
   }
 }
