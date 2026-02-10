@@ -67,5 +67,8 @@
   },
   "footerMadeWith": {
     "message": "Made with care for developers"
+  },
+  "btnClose": {
+    "message": "Close"
   }
 }

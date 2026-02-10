@@ -67,5 +67,8 @@
   },
   "footerMadeWith": {
     "message": "为开发者用心打造"
+  },
+  "btnClose": {
+    "message": "关闭"
   }
 }
