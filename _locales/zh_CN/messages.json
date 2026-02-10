@@ -30,7 +30,10 @@
     "message": "格式化视图"
   },
   "placeholder": {
-    "message": "在此粘贴 JSON 文本，按 Ctrl+Enter 格式化"
+    "message": "在此粘贴 JSON 文本，按 $1 格式化",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
   },
   "errorEmpty": {
     "message": "没有可格式化的内容"
@@ -49,6 +52,18 @@
     "placeholders": {
       "1": { "content": "$1" }
     }
+  },
+  "copyFailed": {
+    "message": "复制失败"
+  },
+  "warnLargeJson": {
+    "message": "JSON 数据较大（$1），处理可能较慢，是否继续？",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
+  },
+  "errorTooLarge": {
+    "message": "JSON 超过 10MB，无法处理"
   },
   "footerMadeWith": {
     "message": "为开发者用心打造"

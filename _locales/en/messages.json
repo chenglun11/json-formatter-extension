@@ -30,7 +30,10 @@
     "message": "Formatted View"
   },
   "placeholder": {
-    "message": "Paste JSON here, press Ctrl+Enter to format"
+    "message": "Paste JSON here, press $1 to format",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
   },
   "errorEmpty": {
     "message": "No content to format"
@@ -49,6 +52,18 @@
     "placeholders": {
       "1": { "content": "$1" }
     }
+  },
+  "copyFailed": {
+    "message": "Copy failed"
+  },
+  "warnLargeJson": {
+    "message": "This JSON is very large ($1). Processing may be slow. Continue?",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
+  },
+  "errorTooLarge": {
+    "message": "JSON exceeds 10MB, too large to process"
   },
   "footerMadeWith": {
     "message": "Made with care for developers"

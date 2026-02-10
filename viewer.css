@@ -28,6 +28,8 @@
   --color-null: #6c7086;
   --color-bracket: #9399b2;
   --color-toggle: #6c7086;
+  --shadow-toolbar: 0 1px 8px rgba(0, 0, 0, 0.3);
+  --shadow-toast: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* 亮色主题 */
@@ -55,6 +57,8 @@
     --color-null: #9ca3af;
     --color-bracket: #6b7280;
     --color-toggle: #9ca3af;
+    --shadow-toolbar: 0 1px 8px rgba(0, 0, 0, 0.08);
+    --shadow-toast: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
 }
 
@@ -67,13 +71,33 @@ body {
   flex-direction: column;
 }
 
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-btn);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-btn-hover);
+}
+
 .toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  padding: 14px 24px;
   background: var(--bg-toolbar);
   border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-toolbar);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -87,44 +111,74 @@ body {
 
 .logo {
   font-family: 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-title);
+  background: linear-gradient(135deg, var(--text-title), var(--color-key));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .toolbar h1 {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-title);
+  letter-spacing: -0.3px;
 }
 
 .version {
   font-size: 11px;
   color: var(--color-null);
   background: var(--bg-btn);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .actions button {
-  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
   border: 1px solid var(--border-btn);
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--bg-btn);
   color: var(--text);
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s ease;
+}
+
+.actions button svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
 }
 
 .actions button:hover {
   background: var(--bg-btn-hover);
   border-color: var(--border-btn-hover);
+  transform: translateY(-1px);
+}
+
+.actions button:hover svg {
+  opacity: 1;
+}
+
+.actions button:active {
+  transform: translateY(0);
+}
+
+.actions button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 .main {
@@ -140,6 +194,12 @@ body {
   color: var(--color-error);
   font-size: 14px;
   margin-bottom: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .hidden {
@@ -149,7 +209,7 @@ body {
 .output {
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Consolas, monospace;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.7;
   white-space: pre-wrap;
   word-break: break-all;
 }
@@ -166,6 +226,19 @@ body {
   font-size: 14px;
   line-height: 1.6;
   resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.raw-input:focus {
+  outline: none;
+  border-color: var(--text-title);
+  box-shadow: 0 0 0 3px rgba(203, 166, 247, 0.15);
+}
+
+@media (prefers-color-scheme: light) {
+  .raw-input:focus {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  }
 }
 
 /* JSON 语法高亮 */
@@ -206,7 +279,17 @@ body {
   color: var(--color-toggle);
   cursor: pointer;
   user-select: none;
-  transition: transform 0.15s;
+  transition: transform 0.15s, color 0.15s;
+}
+
+.collapse-toggle:hover {
+  color: var(--text-title);
+}
+
+.collapse-toggle:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .collapsible.collapsed > .collapse-toggle {
@@ -239,16 +322,19 @@ body {
   padding: 10px 20px;
   background: var(--bg-toast);
   color: var(--text-toast);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
+  box-shadow: var(--shadow-toast);
   opacity: 0;
-  transition: opacity 0.3s;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
   z-index: 100;
 }
 
 .toast.show {
   opacity: 1;
+  transform: translateY(0);
 }
 
 /* 页脚 */
@@ -257,7 +343,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 16px 24px;
+  padding: 14px 24px;
   border-top: 1px solid var(--border);
   background: var(--bg-toolbar);
   font-size: 12px;

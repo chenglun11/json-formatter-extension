@@ -1,10 +1,15 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
-  "permissions": ["contextMenus", "storage", "activeTab"],
+  "homepage_url": "https://github.com/chenglun11/json-formatter-extension",
+  "minimum_chrome_version": "88",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "permissions": ["contextMenus", "storage"],
   "background": {
     "service_worker": "background.js"
   },

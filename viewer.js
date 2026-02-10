@@ -11,18 +11,27 @@
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = msg(el.dataset.i18nPlaceholder);
   });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+    el.setAttribute('aria-label', msg(el.dataset.i18nAria));
+  });
 
   // 从 manifest.json 读取版本号
   const manifest = chrome.runtime.getManifest();
   document.getElementById('version').textContent = 'v' + manifest.version;
 
+  // 检测平台，动态设置快捷键提示
+  const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+  const shortcutKey = isMac ? 'Cmd+Enter' : 'Ctrl+Enter';
+  const rawInput = document.getElementById('raw-input');
+  rawInput.placeholder = msg('placeholder', [shortcutKey]);
+
   const output = document.getElementById('output');
   const error = document.getElementById('error');
-  const rawInput = document.getElementById('raw-input');
   const btnExpand = document.getElementById('btn-expand');
   const btnCollapse = document.getElementById('btn-collapse');
   const btnCopy = document.getElementById('btn-copy');
   const btnRaw = document.getElementById('btn-raw');
+  const btnRawLabel = btnRaw.querySelector('span');
 
   let currentJson = null;
   let showingRaw = false;
@@ -83,7 +92,7 @@
     const placeholder = '<span class="json-placeholder">{ ' + msg('items', [count]) + ' }</span>';
 
     let html = '<span class="collapsible">';
-    html += '<span class="collapse-toggle">▼</span>';
+    html += '<span class="collapse-toggle" role="button" tabindex="0" aria-label="toggle">▼</span>';
     html += '<span class="json-bracket">{</span>' + placeholder;
     html += '<span class="json-content">\n';
 
@@ -111,7 +120,7 @@
     const placeholder = '<span class="json-placeholder">[ ' + msg('items', [count]) + ' ]</span>';
 
     let html = '<span class="collapsible">';
-    html += '<span class="collapse-toggle">▼</span>';
+    html += '<span class="collapse-toggle" role="button" tabindex="0" aria-label="toggle">▼</span>';
     html += '<span class="json-bracket">[</span>' + placeholder;
     html += '<span class="json-content">\n';
 
@@ -137,6 +146,23 @@
       return;
     }
 
+    const sizeMB = new Blob([text]).size / (1024 * 1024);
+
+    // 超过 10MB 直接拒绝
+    if (sizeMB > 10) {
+      error.textContent = msg('errorTooLarge');
+      error.classList.remove('hidden');
+      return;
+    }
+
+    // 超过 5MB 弹出警告
+    if (sizeMB > 5) {
+      const sizeLabel = sizeMB.toFixed(1) + 'MB';
+      if (!confirm(msg('warnLargeJson', [sizeLabel]))) {
+        return;
+      }
+    }
+
     try {
       currentJson = JSON.parse(text);
       output.innerHTML = renderValue(currentJson, 0);
@@ -150,6 +176,14 @@
   // 事件委托：仅点击箭头触发折叠，不影响文本选择
   output.addEventListener('click', (e) => {
     if (e.target.classList.contains('collapse-toggle')) {
+      e.target.closest('.collapsible').classList.toggle('collapsed');
+    }
+  });
+
+  // 键盘支持：Enter/Space 触发折叠切换
+  output.addEventListener('keydown', (e) => {
+    if (e.target.classList.contains('collapse-toggle') && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
       e.target.closest('.collapsible').classList.toggle('collapsed');
     }
   });
@@ -174,6 +208,8 @@
     const text = JSON.stringify(currentJson, null, 2);
     navigator.clipboard.writeText(text).then(() => {
       showToast(msg('copied'));
+    }).catch(() => {
+      showToast(msg('copyFailed'));
     });
   });
 
@@ -186,12 +222,12 @@
       rawInput.value = currentJson
         ? JSON.stringify(currentJson, null, 2)
         : '';
-      btnRaw.textContent = msg('btnFormatted');
+      btnRawLabel.textContent = msg('btnFormatted');
       rawInput.focus();
     } else {
       rawInput.classList.add('hidden');
       output.classList.remove('hidden');
-      btnRaw.textContent = msg('btnRaw');
+      btnRawLabel.textContent = msg('btnRaw');
       if (rawInput.value.trim()) {
         formatJson(rawInput.value);
       }
@@ -207,7 +243,7 @@
         showingRaw = false;
         rawInput.classList.add('hidden');
         output.classList.remove('hidden');
-        btnRaw.textContent = msg('btnRaw');
+        btnRawLabel.textContent = msg('btnRaw');
       }
     }
   });
@@ -222,7 +258,7 @@
       showingRaw = true;
       output.classList.add('hidden');
       rawInput.classList.remove('hidden');
-      btnRaw.textContent = msg('btnFormatted');
+      btnRawLabel.textContent = msg('btnFormatted');
       rawInput.focus();
     }
   });
