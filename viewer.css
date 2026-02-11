@@ -335,6 +335,18 @@ body {
 /* 折叠功能 */
 .collapsible {
   position: relative;
+  border-radius: 3px;
+  transition: background 0.15s;
+}
+
+.collapsible.highlight {
+  background: rgba(137, 180, 250, 0.08);
+}
+
+@media (prefers-color-scheme: light) {
+  .collapsible.highlight {
+    background: rgba(37, 99, 235, 0.06);
+  }
 }
 
 .collapse-toggle {
@@ -347,7 +359,7 @@ body {
   vertical-align: text-top;
   text-align: center;
   transform-origin: center;
-  transition: transform 0.2s ease, color 0.15s;
+  transition: transform 0.15s ease, color 0.15s;
 }
 
 .collapse-toggle:hover {
@@ -380,12 +392,12 @@ body {
 
 .json-content {
   display: inline;
-  animation: jf-expand 0.2s ease;
+  animation: jf-expand 0.15s ease;
 }
 
 @keyframes jf-expand {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* 复制成功提示 */

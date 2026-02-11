@@ -356,6 +356,22 @@
     }
   });
 
+  // 悬停高亮最近的可折叠区块
+  let highlightedEl = null;
+  output.addEventListener('mouseover', (e) => {
+    const target = e.target.closest('.collapsible');
+    if (target === highlightedEl) return;
+    if (highlightedEl) highlightedEl.classList.remove('highlight');
+    highlightedEl = target;
+    if (highlightedEl) highlightedEl.classList.add('highlight');
+  });
+  output.addEventListener('mouseleave', () => {
+    if (highlightedEl) {
+      highlightedEl.classList.remove('highlight');
+      highlightedEl = null;
+    }
+  });
+
   // 键盘支持：Enter/Space 触发折叠切换
   output.addEventListener('keydown', (e) => {
     if (e.target.classList.contains('collapse-toggle') && (e.key === 'Enter' || e.key === ' ')) {

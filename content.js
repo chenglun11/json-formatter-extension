@@ -484,7 +484,21 @@
       border-radius: 2px;
     }
 
-    .collapsible { position: relative; }
+    .collapsible {
+      position: relative;
+      border-radius: 3px;
+      transition: background 0.15s;
+    }
+
+    .collapsible.highlight {
+      background: rgba(137, 180, 250, 0.08);
+    }
+
+    @media (prefers-color-scheme: light) {
+      .collapsible.highlight {
+        background: rgba(37, 99, 235, 0.06);
+      }
+    }
 
     .collapse-toggle {
       display: inline-block;
@@ -824,6 +838,22 @@
   output.addEventListener('click', (e) => {
     if (e.target.classList.contains('collapse-toggle')) {
       e.target.closest('.collapsible').classList.toggle('collapsed');
+    }
+  });
+
+  // 悬停高亮最近的可折叠区块
+  let highlightedEl = null;
+  output.addEventListener('mouseover', (e) => {
+    const target = e.target.closest('.collapsible');
+    if (target === highlightedEl) return;
+    if (highlightedEl) highlightedEl.classList.remove('highlight');
+    highlightedEl = target;
+    if (highlightedEl) highlightedEl.classList.add('highlight');
+  });
+  output.addEventListener('mouseleave', () => {
+    if (highlightedEl) {
+      highlightedEl.classList.remove('highlight');
+      highlightedEl = null;
     }
   });
 
