@@ -27,7 +27,7 @@
     "message": "Edit JSON"
   },
   "btnFormatted": {
-    "message": "Edit"
+    "message": "Format"
   },
   "placeholder": {
     "message": "Paste JSON here, press $1 to format",

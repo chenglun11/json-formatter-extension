@@ -191,6 +191,11 @@ body {
   outline-offset: 2px;
 }
 
+#btn-raw {
+  min-width: 90px;
+  justify-content: center;
+}
+
 .query-bar {
   display: flex;
   align-items: center;

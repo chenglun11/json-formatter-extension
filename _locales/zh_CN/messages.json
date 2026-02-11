@@ -27,7 +27,7 @@
     "message": "编辑 JSON"
   },
   "btnFormatted": {
-    "message": "编辑"
+    "message": "格式化"
   },
   "placeholder": {
     "message": "在此粘贴 JSON 文本，按 $1 格式化",

@@ -324,11 +324,14 @@
       }
     }
 
-    // 自动检测 Unicode 转义序列
+    // 自动检测 Unicode 转义序列，检测到则锁定开启
     const hasUnicode = /\\u[0-9a-fA-F]{4}/.test(text);
-    if (hasUnicode && !unicodeDecode) {
+    if (hasUnicode) {
       unicodeDecode = true;
       btnUnicode.classList.add('active');
+      btnUnicode.disabled = true;
+    } else {
+      btnUnicode.disabled = false;
     }
     if (unicodeDecode) text = decodeUnicode(text);
 
@@ -434,16 +437,18 @@
   });
 
   // 切换编辑 / 格式化视图
+  const btnRawLabel = btnRaw.querySelector('span');
   btnRaw.addEventListener('click', () => {
     showingRaw = !showingRaw;
     btnRaw.classList.toggle('active', showingRaw);
+    btnRawLabel.textContent = showingRaw ? msg('btnFormatted') : msg('btnRaw');
     if (showingRaw) {
       output.classList.add('hidden');
       rawInput.classList.remove('hidden');
       queryBar.classList.add('hidden');
       rawInput.value = currentJson
         ? JSON.stringify(currentJson, null, 2)
-        : '';
+        : lastRawText || '';
       rawInput.focus();
     } else {
       rawInput.classList.add('hidden');
@@ -468,7 +473,7 @@
     }
   });
 
-  // Unicode 解码切换
+  // Unicode 解码切换（仅手动输入无 \uXXXX 时可切换）
   btnUnicode.addEventListener('click', () => {
     unicodeDecode = !unicodeDecode;
     btnUnicode.classList.toggle('active', unicodeDecode);

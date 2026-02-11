@@ -833,11 +833,14 @@
       return;
     }
 
-    // 自动检测 Unicode 转义序列
+    // 自动检测 Unicode 转义序列，检测到则锁定开启
     const hasUnicode = /\\u[0-9a-fA-F]{4}/.test(text);
-    if (hasUnicode && !unicodeDecode) {
+    if (hasUnicode) {
       unicodeDecode = true;
       btnUnicode.classList.add('active');
+      btnUnicode.disabled = true;
+    } else {
+      btnUnicode.disabled = false;
     }
     if (unicodeDecode) text = decodeUnicode(text);
 
@@ -952,7 +955,7 @@
     });
   });
 
-  // Unicode 解码切换
+  // Unicode 解码切换（仅手动输入无 \uXXXX 时可切换）
   btnUnicode.addEventListener('click', () => {
     unicodeDecode = !unicodeDecode;
     btnUnicode.classList.toggle('active', unicodeDecode);
