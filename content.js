@@ -382,6 +382,17 @@
     .jf-actions button:hover svg {
       opacity: 1;
     }
+
+    .jf-actions button.active {
+      background: var(--text-title);
+      border-color: var(--text-title);
+      color: #fff;
+    }
+
+    .jf-actions button.active svg {
+      opacity: 1;
+    }
+
     .jf-close {
       background: transparent !important;
       border: none !important;
@@ -461,6 +472,18 @@
     .json-null { color: var(--color-null); font-style: italic; }
     .json-bracket { color: var(--color-bracket); }
 
+    .json-line-num {
+      color: var(--color-null);
+      user-select: none;
+    }
+
+    .json-error-line {
+      display: inline-block;
+      width: 100%;
+      background: var(--bg-error);
+      border-radius: 2px;
+    }
+
     .collapsible { position: relative; }
 
     .collapse-toggle {
@@ -508,7 +531,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 16px;
+      padding: 6px 16px;
       background: var(--bg-toolbar);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
@@ -516,25 +539,24 @@
 
     .jf-query-input {
       flex: 1;
-      padding: 5px 8px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 5px;
+      padding: 3px 0;
+      background: transparent;
+      border: none;
       color: var(--text);
       font-family: 'SF Mono', Menlo, Consolas, monospace;
-      font-size: 12px;
+      font-size: 13px;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     .jf-query-input:focus {
-      border-color: var(--text-title);
+      border-bottom-color: var(--text-title);
     }
 
     .jf-query-status {
       font-size: 11px;
       color: var(--color-null);
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .jf-query-status.error {
@@ -614,17 +636,11 @@
   actions.className = 'jf-actions';
   titlebar.appendChild(actions);
 
-  // 按钮：展开全部
-  const btnExpand = document.createElement('button');
-  btnExpand.innerHTML = ICON_EXPAND + '<span>' + msg('btnExpand') + '</span>';
-  btnExpand.title = msg('btnExpand');
-  actions.appendChild(btnExpand);
-
-  // 按钮：折叠全部
-  const btnCollapse = document.createElement('button');
-  btnCollapse.innerHTML = ICON_COLLAPSE + '<span>' + msg('btnCollapse') + '</span>';
-  btnCollapse.title = msg('btnCollapse');
-  actions.appendChild(btnCollapse);
+  // 按钮：展开/折叠 toggle
+  const btnToggleCollapse = document.createElement('button');
+  btnToggleCollapse.innerHTML = '<span class="icon-collapse">' + ICON_COLLAPSE + '</span><span class="icon-expand" style="display:none">' + ICON_EXPAND + '</span><span class="toggle-label">' + msg('btnCollapse') + '</span>';
+  btnToggleCollapse.title = msg('btnCollapse');
+  actions.appendChild(btnToggleCollapse);
 
   // 按钮：复制
   const btnCopy = document.createElement('button');
@@ -771,6 +787,29 @@
     } catch (e) {
       errorEl.textContent = msg('errorParse', [e.message]);
       errorEl.classList.add('show');
+      // 显示带行号的原始文本，高亮出错行
+      const pos = /position\s+(\d+)/i.exec(e.message);
+      const lines = text.split('\n');
+      let errorLine = -1;
+      if (pos) {
+        let count = 0;
+        for (let i = 0; i < lines.length; i++) {
+          count += lines[i].length + 1;
+          if (count > parseInt(pos[1], 10)) {
+            errorLine = i;
+            break;
+          }
+        }
+      }
+      const pad = String(lines.length).length;
+      output.innerHTML = lines.map((line, i) => {
+        const num = String(i + 1).padStart(pad, ' ');
+        const prefix = '<span class="json-line-num">' + num + '</span>  ';
+        if (i === errorLine) {
+          return '<span class="json-error-line">' + prefix + escapeHtml(line) + '</span>';
+        }
+        return prefix + escapeHtml(line);
+      }).join('\n');
     }
   }
 
@@ -796,18 +835,30 @@
     }
   });
 
-  // 展开全部
-  btnExpand.addEventListener('click', () => {
-    output.querySelectorAll('.collapsible.collapsed').forEach(el => {
-      el.classList.remove('collapsed');
-    });
-  });
-
-  // 折叠全部
-  btnCollapse.addEventListener('click', () => {
-    output.querySelectorAll('.collapsible').forEach(el => {
-      el.classList.add('collapsed');
-    });
+  // 展开/折叠 toggle
+  let allCollapsed = false;
+  const toggleLabel = btnToggleCollapse.querySelector('.toggle-label');
+  const toggleIconCollapse = btnToggleCollapse.querySelector('.icon-collapse');
+  const toggleIconExpand = btnToggleCollapse.querySelector('.icon-expand');
+  btnToggleCollapse.addEventListener('click', () => {
+    allCollapsed = !allCollapsed;
+    if (allCollapsed) {
+      output.querySelectorAll('.collapsible').forEach(el => {
+        el.classList.add('collapsed');
+      });
+      btnToggleCollapse.classList.add('active');
+      toggleLabel.textContent = msg('btnExpand');
+      toggleIconCollapse.style.display = 'none';
+      toggleIconExpand.style.display = '';
+    } else {
+      output.querySelectorAll('.collapsible.collapsed').forEach(el => {
+        el.classList.remove('collapsed');
+      });
+      btnToggleCollapse.classList.remove('active');
+      toggleLabel.textContent = msg('btnCollapse');
+      toggleIconCollapse.style.display = '';
+      toggleIconExpand.style.display = 'none';
+    }
   });
 
   // 复制

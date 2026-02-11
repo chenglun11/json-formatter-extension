@@ -9,10 +9,10 @@
     "message": "格式化 JSON"
   },
   "btnExpand": {
-    "message": "展开全部"
+    "message": "展开"
   },
   "btnCollapse": {
-    "message": "折叠全部"
+    "message": "折叠"
   },
   "btnCopy": {
     "message": "复制"

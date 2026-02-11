@@ -195,7 +195,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 16px;
+  padding: 6px 16px;
   background: var(--bg-toolbar);
   border-bottom: 1px solid var(--border);
 }
@@ -206,32 +206,31 @@ body {
 
 .query-input {
   flex: 1;
-  padding: 4px 8px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 5px;
+  padding: 3px 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
   color: var(--text);
   font-family: 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 12px;
+  font-size: 13px;
   outline: none;
-  transition: border-color 0.2s;
-}
-
-.query-input:focus {
-  border-color: var(--text-title);
 }
 
 .query-status {
   font-size: 11px;
   color: var(--color-null);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.query-status.error {
+.query-status.has-error {
   color: var(--color-error);
 }
 
-.query-status.success {
+.query-status.has-success {
   color: var(--color-string);
 }
 
@@ -321,6 +320,18 @@ body {
   color: var(--color-bracket);
 }
 
+.json-line-num {
+  color: var(--color-null);
+  user-select: none;
+}
+
+.json-error-line {
+  display: inline-block;
+  width: 100%;
+  background: var(--bg-error);
+  border-radius: 2px;
+}
+
 /* 折叠功能 */
 .collapsible {
   position: relative;
@@ -336,7 +347,7 @@ body {
   vertical-align: text-top;
   text-align: center;
   transform-origin: center;
-  transition: transform 0.15s, color 0.15s;
+  transition: transform 0.2s ease, color 0.15s;
 }
 
 .collapse-toggle:hover {
@@ -369,6 +380,12 @@ body {
 
 .json-content {
   display: inline;
+  animation: jf-expand 0.2s ease;
+}
+
+@keyframes jf-expand {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* 复制成功提示 */

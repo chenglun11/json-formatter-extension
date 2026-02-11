@@ -9,10 +9,10 @@
     "message": "Format JSON"
   },
   "btnExpand": {
-    "message": "Expand All"
+    "message": "Expand"
   },
   "btnCollapse": {
-    "message": "Collapse All"
+    "message": "Collapse"
   },
   "btnCopy": {
     "message": "Copy"

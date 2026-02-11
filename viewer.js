@@ -27,8 +27,10 @@
 
   const output = document.getElementById('output');
   const error = document.getElementById('error');
-  const btnExpand = document.getElementById('btn-expand');
-  const btnCollapse = document.getElementById('btn-collapse');
+  const btnToggleCollapse = document.getElementById('btn-toggle-collapse');
+  const btnToggleLabel = btnToggleCollapse.querySelector('span');
+  const btnToggleIconCollapse = btnToggleCollapse.querySelector('.icon-collapse');
+  const btnToggleIconExpand = btnToggleCollapse.querySelector('.icon-expand');
   const btnCopy = document.getElementById('btn-copy');
   const btnRaw = document.getElementById('btn-raw');
   const btnQuery = document.getElementById('btn-query');
@@ -150,19 +152,19 @@
       if (results.length === 0) {
         queryResult = null;
         queryStatusEl.textContent = msg('jsonpathNoResults');
-        queryStatusEl.className = 'query-status error';
+        queryStatusEl.className = 'query-status has-error';
         output.innerHTML = '';
       } else {
         queryResult = results.length === 1 ? results[0] : results;
         const count = results.length;
         queryStatusEl.textContent = count === 1 ? msg('jsonpathMatch', [count]) : msg('jsonpathMatches', [count]);
-        queryStatusEl.className = 'query-status success';
+        queryStatusEl.className = 'query-status has-success';
         output.innerHTML = renderValue(queryResult, 0);
       }
     } catch (e) {
       queryResult = null;
       queryStatusEl.textContent = msg('jsonpathError');
-      queryStatusEl.className = 'query-status error';
+      queryStatusEl.className = 'query-status has-error';
     }
   }
 
@@ -321,6 +323,29 @@
       error.textContent = msg('errorParse', [e.message]);
       error.classList.remove('hidden');
       currentJson = null;
+      // 显示带行号的原始文本，高亮出错行
+      const pos = /position\s+(\d+)/i.exec(e.message);
+      const lines = text.split('\n');
+      let errorLine = -1;
+      if (pos) {
+        let count = 0;
+        for (let i = 0; i < lines.length; i++) {
+          count += lines[i].length + 1;
+          if (count > parseInt(pos[1], 10)) {
+            errorLine = i;
+            break;
+          }
+        }
+      }
+      const pad = String(lines.length).length;
+      output.innerHTML = lines.map((line, i) => {
+        const num = String(i + 1).padStart(pad, ' ');
+        const prefix = '<span class="json-line-num">' + num + '</span>  ';
+        if (i === errorLine) {
+          return '<span class="json-error-line">' + prefix + escapeHtml(line) + '</span>';
+        }
+        return prefix + escapeHtml(line);
+      }).join('\n');
     }
   }
 
@@ -339,18 +364,27 @@
     }
   });
 
-  // 展开全部
-  btnExpand.addEventListener('click', () => {
-    output.querySelectorAll('.collapsible.collapsed').forEach(el => {
-      el.classList.remove('collapsed');
-    });
-  });
-
-  // 折叠全部
-  btnCollapse.addEventListener('click', () => {
-    output.querySelectorAll('.collapsible').forEach(el => {
-      el.classList.add('collapsed');
-    });
+  // 展开/折叠 toggle
+  let allCollapsed = false;
+  btnToggleCollapse.addEventListener('click', () => {
+    allCollapsed = !allCollapsed;
+    if (allCollapsed) {
+      output.querySelectorAll('.collapsible').forEach(el => {
+        el.classList.add('collapsed');
+      });
+      btnToggleCollapse.classList.add('active');
+      btnToggleLabel.textContent = msg('btnExpand');
+      btnToggleIconCollapse.classList.add('hidden');
+      btnToggleIconExpand.classList.remove('hidden');
+    } else {
+      output.querySelectorAll('.collapsible.collapsed').forEach(el => {
+        el.classList.remove('collapsed');
+      });
+      btnToggleCollapse.classList.remove('active');
+      btnToggleLabel.textContent = msg('btnCollapse');
+      btnToggleIconCollapse.classList.remove('hidden');
+      btnToggleIconExpand.classList.add('hidden');
+    }
   });
 
   // 复制格式化后的 JSON
