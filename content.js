@@ -1,9 +1,15 @@
 (() => {
-  // 如果已存在悬浮窗，先移除旧的再重新创建
-  const existing = document.getElementById('__json_formatter_host__');
-  if (existing) {
-    existing.remove();
-  }
+  // 移除旧版固定 ID 的悬浮窗（兼容升级）
+  const legacy = document.getElementById('__json_formatter_host__');
+  if (legacy) legacy.remove();
+
+  // 移除所有未 pin 的悬浮窗，保留已 pin 的
+  document.querySelectorAll('[id^="__json_formatter_host_"]').forEach(el => {
+    if (!el.classList.contains('pinned')) el.remove();
+  });
+
+  // 统计已 pin 窗口数量，用于错开位置
+  const pinnedCount = document.querySelectorAll('[id^="__json_formatter_host_"].pinned').length;
 
   const msg = chrome.i18n.getMessage;
 
@@ -430,7 +436,7 @@
   // ── 创建 Shadow DOM 容器 ──
 
   const host = document.createElement('div');
-  host.id = '__json_formatter_host__';
+  host.id = '__json_formatter_host_' + Date.now() + '__';
   const shadow = host.attachShadow({ mode: 'closed' });
 
   // 注入样式
@@ -555,6 +561,8 @@
 
   function closeDialog() {
     host.remove();
+    document.removeEventListener('keydown', onEsc);
+    chrome.runtime.onMessage.removeListener(onMessage);
   }
   // ── 事件绑定 ──
 
@@ -608,17 +616,24 @@
     host.classList.toggle('pinned', pinned);
     btnPin.classList.toggle('active', pinned);
     btnPin.title = pinned ? msg('btnUnpin') : msg('btnPin');
+    // pin 后不再响应新的格式化消息
+    if (pinned) {
+      chrome.runtime.onMessage.removeListener(onMessage);
+    } else {
+      chrome.runtime.onMessage.addListener(onMessage);
+    }
   });
 
   // 点击遮罩关闭（仅非固定模式）
   overlay.addEventListener('click', closeDialog);
 
-  // ESC 关闭
-  document.addEventListener('keydown', function onEsc(e) {
-    if (e.key === 'Escape' && document.getElementById('__json_formatter_host__')) {
+  // ESC 关闭（只关闭当前实例的未 pin 窗口）
+  function onEsc(e) {
+    if (e.key === 'Escape' && !pinned && host.parentNode) {
       closeDialog();
     }
-  });
+  }
+  document.addEventListener('keydown', onEsc);
   // ── 拖拽移动 ──
 
   let isDragging = false;
@@ -655,8 +670,9 @@
   function centerDialog() {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    dialog.style.left = Math.max(0, (w - 620) / 2) + 'px';
-    dialog.style.top = Math.max(0, (h - 520) / 2) + 'px';
+    const offset = pinnedCount * 30;
+    dialog.style.left = Math.max(0, (w - 620) / 2 + offset) + 'px';
+    dialog.style.top = Math.max(0, (h - 520) / 2 + offset) + 'px';
   }
 
   centerDialog();
@@ -667,9 +683,10 @@
 
   // ── 监听来自 background.js 的消息 ──
 
-  chrome.runtime.onMessage.addListener((message) => {
+  function onMessage(message) {
     if (message.action === 'formatJson') {
       formatJson(message.text);
     }
-  });
+  }
+  chrome.runtime.onMessage.addListener(onMessage);
 })();
