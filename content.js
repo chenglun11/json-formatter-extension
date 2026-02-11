@@ -101,6 +101,10 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Menlo, monospace;
     }
 
+    :host(.pinned) {
+      pointer-events: none;
+    }
+
     /* 暗色主题（默认） */
     .jf-root {
       --bg: #1e1e2e;
@@ -156,14 +160,16 @@
         --shadow-toast: 0 4px 12px rgba(0, 0, 0, 0.12);
       }
     }
+
     .jf-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       animation: jf-fade-in 0.15s ease;
+    }
+
+    :host(.pinned) .jf-overlay {
+      display: none;
     }
 
     @keyframes jf-fade-in {
@@ -189,6 +195,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      pointer-events: auto;
       resize: both;
       animation: jf-scale-in 0.15s ease;
     }
@@ -284,6 +291,16 @@
     .jf-close:hover {
       color: var(--color-error) !important;
       background: transparent !important;
+    }
+
+    .jf-pin.active {
+      background: var(--text-title) !important;
+      border-color: var(--text-title) !important;
+      color: #fff !important;
+    }
+
+    .jf-pin.active svg {
+      opacity: 1 !important;
     }
 
     .jf-body {
@@ -408,6 +425,7 @@
   const ICON_EXPAND = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
   const ICON_COLLAPSE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
   const ICON_COPY = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  const ICON_PIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>';
 
   // ── 创建 Shadow DOM 容器 ──
 
@@ -429,10 +447,11 @@
   const overlay = document.createElement('div');
   overlay.className = 'jf-overlay';
   root.appendChild(overlay);
+
   // 对话框
   const dialog = document.createElement('div');
   dialog.className = 'jf-dialog';
-  overlay.appendChild(dialog);
+  root.appendChild(dialog);
 
   // 标题栏
   const titlebar = document.createElement('div');
@@ -465,6 +484,13 @@
   btnCopy.innerHTML = ICON_COPY + '<span>' + msg('btnCopy') + '</span>';
   btnCopy.title = msg('btnCopyTitle');
   actions.appendChild(btnCopy);
+
+  // 按钮：固定
+  const btnPin = document.createElement('button');
+  btnPin.className = 'jf-pin';
+  btnPin.innerHTML = ICON_PIN;
+  btnPin.title = msg('btnPin');
+  actions.appendChild(btnPin);
 
   // 按钮：关闭
   const btnClose = document.createElement('button');
@@ -575,10 +601,17 @@
   // 关闭按钮
   btnClose.addEventListener('click', closeDialog);
 
-  // 点击遮罩关闭
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeDialog();
+  // 固定/取消固定
+  let pinned = false;
+  btnPin.addEventListener('click', () => {
+    pinned = !pinned;
+    host.classList.toggle('pinned', pinned);
+    btnPin.classList.toggle('active', pinned);
+    btnPin.title = pinned ? msg('btnUnpin') : msg('btnPin');
   });
+
+  // 点击遮罩关闭（仅非固定模式）
+  overlay.addEventListener('click', closeDialog);
 
   // ESC 关闭
   document.addEventListener('keydown', function onEsc(e) {

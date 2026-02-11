@@ -71,6 +71,12 @@
   "btnClose": {
     "message": "Close"
   },
+  "btnPin": {
+    "message": "Pin to page"
+  },
+  "btnUnpin": {
+    "message": "Unpin"
+  },
   "onboardingWelcome": {
     "message": "Welcome to JSON Formatter!"
   },

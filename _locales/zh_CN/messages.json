@@ -71,6 +71,12 @@
   "btnClose": {
     "message": "关闭"
   },
+  "btnPin": {
+    "message": "固定到页面"
+  },
+  "btnUnpin": {
+    "message": "取消固定"
+  },
   "onboardingWelcome": {
     "message": "欢迎使用 JSON Formatter！"
   },
