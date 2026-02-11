@@ -21,13 +21,13 @@
     "message": "复制格式化结果"
   },
   "btnRaw": {
-    "message": "原始文本"
+    "message": "编辑"
   },
   "btnRawTitle": {
-    "message": "查看原始文本"
+    "message": "编辑 JSON"
   },
   "btnFormatted": {
-    "message": "格式化视图"
+    "message": "编辑"
   },
   "placeholder": {
     "message": "在此粘贴 JSON 文本，按 $1 格式化",
@@ -112,5 +112,35 @@
   },
   "onboardingCta": {
     "message": "开始使用"
+  },
+  "btnQuery": {
+    "message": "JSONPath"
+  },
+  "btnQueryTitle": {
+    "message": "JSONPath 查询"
+  },
+  "jsonpathPlaceholder": {
+    "message": "JSONPath 查询，如 $.store.book[0].title"
+  },
+  "jsonpathLabel": {
+    "message": "JSONPath 查询输入"
+  },
+  "jsonpathNoResults": {
+    "message": "无结果"
+  },
+  "jsonpathMatch": {
+    "message": "$1 个匹配",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
+  },
+  "jsonpathMatches": {
+    "message": "$1 个匹配",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
+  },
+  "jsonpathError": {
+    "message": "路径无效"
   }
 }

@@ -172,6 +172,16 @@ body {
   opacity: 1;
 }
 
+.actions button.active {
+  background: var(--text-title);
+  border-color: var(--text-title);
+  color: #fff;
+}
+
+.actions button.active svg {
+  opacity: 1;
+}
+
 .actions button:active {
   transform: translateY(0);
 }
@@ -179,6 +189,50 @@ body {
 .actions button:focus-visible {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
+}
+
+.query-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 16px;
+  background: var(--bg-toolbar);
+  border-bottom: 1px solid var(--border);
+}
+
+.query-bar.hidden {
+  display: none !important;
+}
+
+.query-input {
+  flex: 1;
+  padding: 4px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.query-input:focus {
+  border-color: var(--text-title);
+}
+
+.query-status {
+  font-size: 11px;
+  color: var(--color-null);
+  white-space: nowrap;
+}
+
+.query-status.error {
+  color: var(--color-error);
+}
+
+.query-status.success {
+  color: var(--color-string);
 }
 
 .main {
@@ -279,6 +333,9 @@ body {
   color: var(--color-toggle);
   cursor: pointer;
   user-select: none;
+  vertical-align: text-top;
+  text-align: center;
+  transform-origin: center;
   transition: transform 0.15s, color 0.15s;
 }
 

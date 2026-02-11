@@ -25,11 +25,19 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         <span data-i18n="btnCopy"></span>
       </button>
+      <button id="btn-query" data-i18n-title="btnQueryTitle" data-i18n-aria="btnQueryTitle">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span data-i18n="btnQuery"></span>
+      </button>
       <button id="btn-raw" data-i18n-title="btnRawTitle" data-i18n-aria="btnRawTitle">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         <span data-i18n="btnRaw"></span>
       </button>
     </div>
+  </div>
+  <div class="query-bar hidden" id="query-bar">
+    <input type="text" class="query-input" id="query-input" aria-label="" data-i18n-aria="jsonpathLabel" data-i18n-placeholder="jsonpathPlaceholder">
+    <span class="query-status" id="query-status"></span>
   </div>
   <div class="main">
     <div id="error" class="error hidden"></div>

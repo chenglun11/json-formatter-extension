@@ -21,13 +21,13 @@
     "message": "Copy formatted result"
   },
   "btnRaw": {
-    "message": "Raw Text"
+    "message": "Edit"
   },
   "btnRawTitle": {
-    "message": "View raw text"
+    "message": "Edit JSON"
   },
   "btnFormatted": {
-    "message": "Formatted View"
+    "message": "Edit"
   },
   "placeholder": {
     "message": "Paste JSON here, press $1 to format",
@@ -112,5 +112,35 @@
   },
   "onboardingCta": {
     "message": "Get Started"
+  },
+  "btnQuery": {
+    "message": "JSONPath"
+  },
+  "btnQueryTitle": {
+    "message": "JSONPath query"
+  },
+  "jsonpathPlaceholder": {
+    "message": "JSONPath query, e.g. $.store.book[0].title"
+  },
+  "jsonpathLabel": {
+    "message": "JSONPath query input"
+  },
+  "jsonpathNoResults": {
+    "message": "No results"
+  },
+  "jsonpathMatch": {
+    "message": "$1 match",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
+  },
+  "jsonpathMatches": {
+    "message": "$1 matches",
+    "placeholders": {
+      "1": { "content": "$1" }
+    }
+  },
+  "jsonpathError": {
+    "message": "Invalid path"
   }
 }

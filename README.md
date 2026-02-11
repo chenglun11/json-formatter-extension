@@ -25,7 +25,8 @@ A lightweight Chrome extension for formatting and viewing JSON — right from yo
 | **Syntax Highlighting** | Color-coded keys, strings, numbers, booleans, and null |
 | **Collapsible Tree** | Fold / unfold objects and arrays by clicking the `▼` arrow |
 | **Copy** | One-click copy of formatted JSON |
-| **Raw Text Mode** | Paste JSON manually, press `Ctrl+Enter` / `Cmd+Enter` to format |
+| **JSONPath Query** | Built-in JSONPath support (`$.key`, `..key`, `[*]`, `[0:3]`) to quickly locate data in large JSON |
+| **Edit Mode** | Paste JSON manually, press `Ctrl+Enter` / `Cmd+Enter` to format |
 | **Light / Dark Theme** | Automatically follows system appearance |
 | **i18n** | English & Simplified Chinese, auto-detected |
 
@@ -136,6 +137,7 @@ Contributions are welcome! Feel free to open an [issue](https://github.com/cheng
 - 语法高亮（key / string / number / boolean / null 各有颜色）
 - 可折叠的树形视图
 - 一键复制格式化结果
+- 内置 JSONPath 查询，快速定位大型 JSON 中的数据
 - 跟随系统自动切换亮色 / 暗色主题
 - 支持中英文自动切换
 - 首次安装自动展示引导页

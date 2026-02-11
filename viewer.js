@@ -31,10 +31,157 @@
   const btnCollapse = document.getElementById('btn-collapse');
   const btnCopy = document.getElementById('btn-copy');
   const btnRaw = document.getElementById('btn-raw');
-  const btnRawLabel = btnRaw.querySelector('span');
+  const btnQuery = document.getElementById('btn-query');
 
   let currentJson = null;
   let showingRaw = false;
+  let queryResult = null;
+  let queryDebounceTimer = null;
+
+  const queryBar = document.getElementById('query-bar');
+  const queryInput = document.getElementById('query-input');
+  const queryStatusEl = document.getElementById('query-status');
+
+  // JSONPath 查询引擎
+  function jsonPathQuery(root, path) {
+    if (!path || path === '$') return [root];
+    let expr = path.replace(/^\$/, '');
+    const tokens = [];
+    let i = 0;
+    while (i < expr.length) {
+      if (expr[i] === '.') {
+        if (expr[i + 1] === '.') {
+          tokens.push({ type: 'recurse' });
+          i += 2;
+        } else {
+          i += 1;
+          let key = '';
+          while (i < expr.length && expr[i] !== '.' && expr[i] !== '[') {
+            key += expr[i++];
+          }
+          if (key === '*') tokens.push({ type: 'wildcard' });
+          else if (key) tokens.push({ type: 'key', value: key });
+        }
+      } else if (expr[i] === '[') {
+        i++;
+        let inner = '';
+        while (i < expr.length && expr[i] !== ']') {
+          inner += expr[i++];
+        }
+        i++;
+        inner = inner.trim();
+        if (inner === '*') {
+          tokens.push({ type: 'wildcard' });
+        } else if (inner.includes(':')) {
+          const parts = inner.split(':');
+          tokens.push({ type: 'slice', start: parts[0] ? parseInt(parts[0], 10) : undefined, end: parts[1] ? parseInt(parts[1], 10) : undefined });
+        } else if ((inner[0] === "'" && inner[inner.length - 1] === "'") || (inner[0] === '"' && inner[inner.length - 1] === '"')) {
+          tokens.push({ type: 'key', value: inner.slice(1, -1) });
+        } else {
+          const idx = parseInt(inner, 10);
+          if (!isNaN(idx)) tokens.push({ type: 'index', value: idx });
+          else tokens.push({ type: 'key', value: inner });
+        }
+      } else {
+        let key = '';
+        while (i < expr.length && expr[i] !== '.' && expr[i] !== '[') {
+          key += expr[i++];
+        }
+        if (key) tokens.push({ type: 'key', value: key });
+      }
+    }
+    if (tokens.length === 0) return [root];
+
+    function resolve(nodes, tIdx) {
+      if (tIdx >= tokens.length) return nodes;
+      const token = tokens[tIdx];
+      let next = [];
+      if (token.type === 'recurse') {
+        if (tIdx + 1 >= tokens.length) return nodes;
+        const descendants = [];
+        function collect(val) {
+          descendants.push(val);
+          if (val && typeof val === 'object') {
+            if (Array.isArray(val)) val.forEach(v => collect(v));
+            else Object.values(val).forEach(v => collect(v));
+          }
+        }
+        nodes.forEach(n => collect(n));
+        return resolve(descendants, tIdx + 1);
+      }
+      for (const node of nodes) {
+        if (node === null || typeof node !== 'object') continue;
+        if (token.type === 'key') {
+          if (!Array.isArray(node) && token.value in node) next.push(node[token.value]);
+        } else if (token.type === 'index') {
+          const arr = Array.isArray(node) ? node : Object.values(node);
+          const idx = token.value < 0 ? arr.length + token.value : token.value;
+          if (idx >= 0 && idx < arr.length) next.push(arr[idx]);
+        } else if (token.type === 'wildcard') {
+          if (Array.isArray(node)) next.push(...node);
+          else next.push(...Object.values(node));
+        } else if (token.type === 'slice') {
+          const arr = Array.isArray(node) ? node : Object.values(node);
+          const start = token.start !== undefined ? (token.start < 0 ? arr.length + token.start : token.start) : 0;
+          const end = token.end !== undefined ? (token.end < 0 ? arr.length + token.end : token.end) : arr.length;
+          next.push(...arr.slice(start, end));
+        }
+      }
+      return resolve(next, tIdx + 1);
+    }
+
+    return resolve([root], 0);
+  }
+
+  function executeQuery() {
+    const path = queryInput.value.trim();
+    if (!path) {
+      queryResult = null;
+      queryStatusEl.textContent = '';
+      queryStatusEl.className = 'query-status';
+      if (currentJson !== null) {
+        output.innerHTML = renderValue(currentJson, 0);
+      }
+      return;
+    }
+    if (!currentJson) return;
+    try {
+      const results = jsonPathQuery(currentJson, path);
+      if (results.length === 0) {
+        queryResult = null;
+        queryStatusEl.textContent = msg('jsonpathNoResults');
+        queryStatusEl.className = 'query-status error';
+        output.innerHTML = '';
+      } else {
+        queryResult = results.length === 1 ? results[0] : results;
+        const count = results.length;
+        queryStatusEl.textContent = count === 1 ? msg('jsonpathMatch', [count]) : msg('jsonpathMatches', [count]);
+        queryStatusEl.className = 'query-status success';
+        output.innerHTML = renderValue(queryResult, 0);
+      }
+    } catch (e) {
+      queryResult = null;
+      queryStatusEl.textContent = msg('jsonpathError');
+      queryStatusEl.className = 'query-status error';
+    }
+  }
+
+  queryInput.addEventListener('input', () => {
+    clearTimeout(queryDebounceTimer);
+    queryDebounceTimer = setTimeout(executeQuery, 300);
+  });
+
+  queryInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      clearTimeout(queryDebounceTimer);
+      executeQuery();
+    }
+    if (e.key === 'Escape' && queryInput.value) {
+      e.stopPropagation();
+      queryInput.value = '';
+      executeQuery();
+    }
+  });
 
   // 转义 HTML 特殊字符
   function escapeHtml(str) {
@@ -139,6 +286,10 @@
   function formatJson(text) {
     error.classList.add('hidden');
     output.innerHTML = '';
+    queryResult = null;
+    queryInput.value = '';
+    queryStatusEl.textContent = '';
+    queryStatusEl.className = 'query-status';
 
     if (!text || !text.trim()) {
       error.textContent = msg('errorEmpty');
@@ -205,7 +356,8 @@
   // 复制格式化后的 JSON
   btnCopy.addEventListener('click', () => {
     if (!currentJson) return;
-    const text = JSON.stringify(currentJson, null, 2);
+    const data = queryResult !== null ? queryResult : currentJson;
+    const text = JSON.stringify(data, null, 2);
     navigator.clipboard.writeText(text).then(() => {
       showToast(msg('copied'));
     }).catch(() => {
@@ -213,24 +365,38 @@
     });
   });
 
-  // 切换原始文本 / 格式化视图
+  // 切换编辑 / 格式化视图
   btnRaw.addEventListener('click', () => {
     showingRaw = !showingRaw;
+    btnRaw.classList.toggle('active', showingRaw);
     if (showingRaw) {
       output.classList.add('hidden');
       rawInput.classList.remove('hidden');
+      queryBar.classList.add('hidden');
       rawInput.value = currentJson
         ? JSON.stringify(currentJson, null, 2)
         : '';
-      btnRawLabel.textContent = msg('btnFormatted');
       rawInput.focus();
     } else {
       rawInput.classList.add('hidden');
       output.classList.remove('hidden');
-      btnRawLabel.textContent = msg('btnRaw');
       if (rawInput.value.trim()) {
         formatJson(rawInput.value);
       }
+    }
+  });
+
+  // 切换查询栏
+  let queryBarVisible = false;
+  btnQuery.addEventListener('click', () => {
+    if (showingRaw) return;
+    queryBarVisible = !queryBarVisible;
+    queryBar.classList.toggle('hidden', !queryBarVisible);
+    if (queryBarVisible) {
+      queryInput.focus();
+    } else {
+      queryInput.value = '';
+      executeQuery();
     }
   });
 
@@ -241,9 +407,9 @@
       if (rawInput.value.trim()) {
         formatJson(rawInput.value);
         showingRaw = false;
+        btnRaw.classList.remove('active');
         rawInput.classList.add('hidden');
         output.classList.remove('hidden');
-        btnRawLabel.textContent = msg('btnRaw');
       }
     }
   });
@@ -254,11 +420,11 @@
       formatJson(result.jsonText);
       chrome.storage.local.remove('jsonText');
     } else {
-      // 没有数据时显示原始文本输入框
+      // 没有数据时显示编辑模式
       showingRaw = true;
+      btnRaw.classList.add('active');
       output.classList.add('hidden');
       rawInput.classList.remove('hidden');
-      btnRawLabel.textContent = msg('btnFormatted');
       rawInput.focus();
     }
   });

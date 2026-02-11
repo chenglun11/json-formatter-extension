@@ -96,6 +96,103 @@
     html += '</span></span>';
     return html;
   }
+  // ── JSONPath 查询引擎 ──
+
+  function jsonPathQuery(root, path) {
+    if (!path || path === '$') return [root];
+    // 去掉开头的 $
+    let expr = path.replace(/^\$/, '');
+    // 词法分析：拆分为 token
+    const tokens = [];
+    let i = 0;
+    while (i < expr.length) {
+      if (expr[i] === '.') {
+        if (expr[i + 1] === '.') {
+          tokens.push({ type: 'recurse' });
+          i += 2;
+        } else {
+          i += 1;
+          // 读取 key
+          let key = '';
+          while (i < expr.length && expr[i] !== '.' && expr[i] !== '[') {
+            key += expr[i++];
+          }
+          if (key === '*') tokens.push({ type: 'wildcard' });
+          else if (key) tokens.push({ type: 'key', value: key });
+        }
+      } else if (expr[i] === '[') {
+        i++; // skip [
+        let inner = '';
+        while (i < expr.length && expr[i] !== ']') {
+          inner += expr[i++];
+        }
+        i++; // skip ]
+        inner = inner.trim();
+        if (inner === '*') {
+          tokens.push({ type: 'wildcard' });
+        } else if (inner.includes(':')) {
+          const parts = inner.split(':');
+          tokens.push({ type: 'slice', start: parts[0] ? parseInt(parts[0], 10) : undefined, end: parts[1] ? parseInt(parts[1], 10) : undefined });
+        } else if ((inner[0] === "'" && inner[inner.length - 1] === "'") || (inner[0] === '"' && inner[inner.length - 1] === '"')) {
+          tokens.push({ type: 'key', value: inner.slice(1, -1) });
+        } else {
+          const idx = parseInt(inner, 10);
+          if (!isNaN(idx)) tokens.push({ type: 'index', value: idx });
+          else tokens.push({ type: 'key', value: inner });
+        }
+      } else {
+        // 直接读取 key（无前导点的情况，不应出现，但容错）
+        let key = '';
+        while (i < expr.length && expr[i] !== '.' && expr[i] !== '[') {
+          key += expr[i++];
+        }
+        if (key) tokens.push({ type: 'key', value: key });
+      }
+    }
+    if (tokens.length === 0) return [root];
+
+    function resolve(nodes, tIdx) {
+      if (tIdx >= tokens.length) return nodes;
+      const token = tokens[tIdx];
+      let next = [];
+      if (token.type === 'recurse') {
+        // 递归下降：收集所有后代，然后对每个后代应用下一个 token
+        if (tIdx + 1 >= tokens.length) return nodes;
+        const descendants = [];
+        function collect(val) {
+          descendants.push(val);
+          if (val && typeof val === 'object') {
+            if (Array.isArray(val)) val.forEach(v => collect(v));
+            else Object.values(val).forEach(v => collect(v));
+          }
+        }
+        nodes.forEach(n => collect(n));
+        return resolve(descendants, tIdx + 1);
+      }
+      for (const node of nodes) {
+        if (node === null || typeof node !== 'object') continue;
+        if (token.type === 'key') {
+          if (!Array.isArray(node) && token.value in node) next.push(node[token.value]);
+        } else if (token.type === 'index') {
+          const arr = Array.isArray(node) ? node : Object.values(node);
+          const idx = token.value < 0 ? arr.length + token.value : token.value;
+          if (idx >= 0 && idx < arr.length) next.push(arr[idx]);
+        } else if (token.type === 'wildcard') {
+          if (Array.isArray(node)) next.push(...node);
+          else next.push(...Object.values(node));
+        } else if (token.type === 'slice') {
+          const arr = Array.isArray(node) ? node : Object.values(node);
+          const start = token.start !== undefined ? (token.start < 0 ? arr.length + token.start : token.start) : 0;
+          const end = token.end !== undefined ? (token.end < 0 ? arr.length + token.end : token.end) : arr.length;
+          next.push(...arr.slice(start, end));
+        }
+      }
+      return resolve(next, tIdx + 1);
+    }
+
+    return resolve([root], 0);
+  }
+
   // ── Shadow DOM 样式 ──
 
   const STYLES = `
@@ -373,6 +470,9 @@
       color: var(--color-toggle);
       cursor: pointer;
       user-select: none;
+      vertical-align: text-top;
+      text-align: center;
+      transform-origin: center;
       transition: transform 0.15s, color 0.15s;
     }
 
@@ -403,6 +503,47 @@
     }
 
     .json-content { display: inline; }
+
+    .jf-query-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-toolbar);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .jf-query-input {
+      flex: 1;
+      padding: 5px 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text);
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .jf-query-input:focus {
+      border-color: var(--text-title);
+    }
+
+    .jf-query-status {
+      font-size: 11px;
+      color: var(--color-null);
+      white-space: nowrap;
+    }
+
+    .jf-query-status.error {
+      color: var(--color-error);
+    }
+
+    .jf-query-status.success {
+      color: var(--color-string);
+    }
 
     .jf-toast {
       position: absolute;
@@ -505,6 +646,22 @@
   btnClose.title = msg('btnClose');
   actions.appendChild(btnClose);
 
+  // 查询栏
+  const queryBar = document.createElement('div');
+  queryBar.className = 'jf-query-bar';
+  dialog.appendChild(queryBar);
+
+  const queryInput = document.createElement('input');
+  queryInput.type = 'text';
+  queryInput.className = 'jf-query-input';
+  queryInput.placeholder = msg('jsonpathPlaceholder');
+  queryInput.setAttribute('aria-label', msg('jsonpathLabel'));
+  queryBar.appendChild(queryInput);
+
+  const queryStatus = document.createElement('span');
+  queryStatus.className = 'jf-query-status';
+  queryBar.appendChild(queryStatus);
+
   // 内容区域
   const body = document.createElement('div');
   body.className = 'jf-body';
@@ -524,6 +681,8 @@
   // ── 功能逻辑 ──
 
   let currentJson = null;
+  let queryResult = null;
+  let queryDebounceTimer = null;
 
   function showToast(text) {
     toast.textContent = text;
@@ -531,10 +690,66 @@
     setTimeout(() => toast.classList.remove('show'), 1500);
   }
 
+  function executeQuery() {
+    const path = queryInput.value.trim();
+    if (!path) {
+      queryResult = null;
+      queryStatus.textContent = '';
+      queryStatus.className = 'jf-query-status';
+      if (currentJson !== null) {
+        output.innerHTML = renderValue(currentJson, 0);
+      }
+      return;
+    }
+    if (!currentJson) return;
+    try {
+      const results = jsonPathQuery(currentJson, path);
+      if (results.length === 0) {
+        queryResult = null;
+        queryStatus.textContent = msg('jsonpathNoResults');
+        queryStatus.className = 'jf-query-status error';
+        output.innerHTML = '';
+      } else {
+        queryResult = results.length === 1 ? results[0] : results;
+        const count = results.length;
+        queryStatus.textContent = count === 1 ? msg('jsonpathMatch', [count]) : msg('jsonpathMatches', [count]);
+        queryStatus.className = 'jf-query-status success';
+        output.innerHTML = renderValue(queryResult, 0);
+      }
+    } catch (e) {
+      queryResult = null;
+      queryStatus.textContent = msg('jsonpathError');
+      queryStatus.className = 'jf-query-status error';
+    }
+  }
+
+  queryInput.addEventListener('input', () => {
+    clearTimeout(queryDebounceTimer);
+    queryDebounceTimer = setTimeout(executeQuery, 300);
+  });
+
+  queryInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      clearTimeout(queryDebounceTimer);
+      executeQuery();
+    }
+    if (e.key === 'Escape') {
+      if (queryInput.value) {
+        e.stopPropagation();
+        queryInput.value = '';
+        executeQuery();
+      }
+    }
+  });
+
   function formatJson(text) {
     errorEl.classList.remove('show');
     output.innerHTML = '';
     currentJson = null;
+    queryResult = null;
+    queryInput.value = '';
+    queryStatus.textContent = '';
+    queryStatus.className = 'jf-query-status';
 
     if (!text || !text.trim()) {
       errorEl.textContent = msg('errorEmpty');
@@ -598,7 +813,8 @@
   // 复制
   btnCopy.addEventListener('click', () => {
     if (!currentJson) return;
-    const text = JSON.stringify(currentJson, null, 2);
+    const data = queryResult !== null ? queryResult : currentJson;
+    const text = JSON.stringify(data, null, 2);
     navigator.clipboard.writeText(text).then(() => {
       showToast(msg('copied'));
     }).catch(() => {
@@ -630,6 +846,12 @@
   // ESC 关闭（只关闭当前实例的未 pin 窗口）
   function onEsc(e) {
     if (e.key === 'Escape' && !pinned && host.parentNode) {
+      // 如果查询栏有内容，先清空查询
+      if (queryInput.value) {
+        queryInput.value = '';
+        executeQuery();
+        return;
+      }
       closeDialog();
     }
   }
