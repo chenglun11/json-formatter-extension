@@ -142,5 +142,11 @@
   },
   "jsonpathError": {
     "message": "路径无效"
+  },
+  "btnUnicode": {
+    "message": "Unicode"
+  },
+  "btnUnicodeTitle": {
+    "message": "Unicode 转中文"
   }
 }

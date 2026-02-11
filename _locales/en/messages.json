@@ -142,5 +142,11 @@
   },
   "jsonpathError": {
     "message": "Invalid path"
+  },
+  "btnUnicode": {
+    "message": "Unicode"
+  },
+  "btnUnicodeTitle": {
+    "message": "Decode Unicode escapes"
   }
 }

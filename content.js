@@ -15,6 +15,10 @@
 
   // ── JSON 渲染逻辑（复用 viewer.js） ──
 
+  function decodeUnicode(text) {
+    return text.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  }
+
   function escapeHtml(str) {
     return str
       .replace(/&/g, '&amp;')
@@ -199,9 +203,12 @@
     :host {
       all: initial;
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
       z-index: 2147483647;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Menlo, monospace;
+    }
+
+    :host(:not(.pinned)) {
+      top: 0; left: 0; right: 0; bottom: 0;
     }
 
     :host(.pinned) {
@@ -609,6 +616,7 @@
   const ICON_COLLAPSE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
   const ICON_COPY = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
   const ICON_PIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>';
+  const ICON_UNICODE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
 
   // ── 创建 Shadow DOM 容器 ──
 
@@ -662,6 +670,12 @@
   btnCopy.title = msg('btnCopyTitle');
   actions.appendChild(btnCopy);
 
+  // 按钮：Unicode 解码
+  const btnUnicode = document.createElement('button');
+  btnUnicode.innerHTML = ICON_UNICODE + '<span>' + msg('btnUnicode') + '</span>';
+  btnUnicode.title = msg('btnUnicodeTitle');
+  actions.appendChild(btnUnicode);
+
   // 按钮：固定
   const btnPin = document.createElement('button');
   btnPin.className = 'jf-pin';
@@ -713,6 +727,29 @@
   let currentJson = null;
   let queryResult = null;
   let queryDebounceTimer = null;
+  let unicodeDecode = false;
+  let lastRawText = '';
+
+  // 拖拽状态（提前声明，closeDialog 需要引用）
+  let isDragging = false;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+
+  function onDragMove(e) {
+    const x = e.clientX - dragOffsetX;
+    const y = e.clientY - dragOffsetY;
+    dialog.style.left = x + 'px';
+    dialog.style.top = y + 'px';
+    dialog.style.right = 'auto';
+    dialog.style.bottom = 'auto';
+    dialog.style.margin = '0';
+  }
+
+  function onDragEnd() {
+    isDragging = false;
+    document.removeEventListener('mousemove', onDragMove, true);
+    document.removeEventListener('mouseup', onDragEnd, true);
+  }
 
   function showToast(text) {
     toast.textContent = text;
@@ -773,6 +810,7 @@
   });
 
   function formatJson(text) {
+    lastRawText = text;
     errorEl.classList.remove('show');
     output.innerHTML = '';
     currentJson = null;
@@ -795,12 +833,22 @@
       return;
     }
 
+    // 自动检测 Unicode 转义序列
+    const hasUnicode = /\\u[0-9a-fA-F]{4}/.test(text);
+    if (hasUnicode && !unicodeDecode) {
+      unicodeDecode = true;
+      btnUnicode.classList.add('active');
+    }
+    if (unicodeDecode) text = decodeUnicode(text);
+
     try {
       currentJson = JSON.parse(text);
       output.innerHTML = renderValue(currentJson, 0);
     } catch (e) {
-      errorEl.textContent = msg('errorParse', [e.message]);
-      errorEl.classList.add('show');
+      if (!unicodeDecode) {
+        errorEl.textContent = msg('errorParse', [e.message]);
+        errorEl.classList.add('show');
+      }
       // 显示带行号的原始文本，高亮出错行
       const pos = /position\s+(\d+)/i.exec(e.message);
       const lines = text.split('\n');
@@ -828,8 +876,9 @@
   }
 
   function closeDialog() {
+    if (isDragging) onDragEnd();
     host.remove();
-    document.removeEventListener('keydown', onEsc);
+    document.removeEventListener('keydown', onEsc, true);
     chrome.runtime.onMessage.removeListener(onMessage);
   }
   // ── 事件绑定 ──
@@ -903,6 +952,13 @@
     });
   });
 
+  // Unicode 解码切换
+  btnUnicode.addEventListener('click', () => {
+    unicodeDecode = !unicodeDecode;
+    btnUnicode.classList.toggle('active', unicodeDecode);
+    if (lastRawText) formatJson(lastRawText);
+  });
+
   // 关闭按钮
   btnClose.addEventListener('click', closeDialog);
 
@@ -929,19 +985,19 @@
     if (e.key === 'Escape' && !pinned && host.parentNode) {
       // 如果查询栏有内容，先清空查询
       if (queryInput.value) {
+        e.stopPropagation();
+        e.preventDefault();
         queryInput.value = '';
         executeQuery();
         return;
       }
+      e.stopPropagation();
+      e.preventDefault();
       closeDialog();
     }
   }
-  document.addEventListener('keydown', onEsc);
+  document.addEventListener('keydown', onEsc, true);
   // ── 拖拽移动 ──
-
-  let isDragging = false;
-  let dragOffsetX = 0;
-  let dragOffsetY = 0;
 
   titlebar.addEventListener('mousedown', (e) => {
     // 不拦截按钮点击
@@ -951,21 +1007,8 @@
     dragOffsetX = e.clientX - rect.left;
     dragOffsetY = e.clientY - rect.top;
     e.preventDefault();
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const x = e.clientX - dragOffsetX;
-    const y = e.clientY - dragOffsetY;
-    dialog.style.left = x + 'px';
-    dialog.style.top = y + 'px';
-    dialog.style.right = 'auto';
-    dialog.style.bottom = 'auto';
-    dialog.style.margin = '0';
-  });
-
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
+    document.addEventListener('mousemove', onDragMove, true);
+    document.addEventListener('mouseup', onDragEnd, true);
   });
 
   // ── 居中定位 ──

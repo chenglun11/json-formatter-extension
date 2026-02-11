@@ -34,11 +34,14 @@
   const btnCopy = document.getElementById('btn-copy');
   const btnRaw = document.getElementById('btn-raw');
   const btnQuery = document.getElementById('btn-query');
+  const btnUnicode = document.getElementById('btn-unicode');
 
   let currentJson = null;
   let showingRaw = false;
   let queryResult = null;
   let queryDebounceTimer = null;
+  let unicodeDecode = false;
+  let lastRawText = '';
 
   const queryBar = document.getElementById('query-bar');
   const queryInput = document.getElementById('query-input');
@@ -185,6 +188,10 @@
     }
   });
 
+  function decodeUnicode(text) {
+    return text.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  }
+
   // 转义 HTML 特殊字符
   function escapeHtml(str) {
     return str
@@ -286,6 +293,7 @@
 
   // 格式化并展示 JSON
   function formatJson(text) {
+    lastRawText = text;
     error.classList.add('hidden');
     output.innerHTML = '';
     queryResult = null;
@@ -316,12 +324,22 @@
       }
     }
 
+    // 自动检测 Unicode 转义序列
+    const hasUnicode = /\\u[0-9a-fA-F]{4}/.test(text);
+    if (hasUnicode && !unicodeDecode) {
+      unicodeDecode = true;
+      btnUnicode.classList.add('active');
+    }
+    if (unicodeDecode) text = decodeUnicode(text);
+
     try {
       currentJson = JSON.parse(text);
       output.innerHTML = renderValue(currentJson, 0);
     } catch (e) {
-      error.textContent = msg('errorParse', [e.message]);
-      error.classList.remove('hidden');
+      if (!unicodeDecode) {
+        error.textContent = msg('errorParse', [e.message]);
+        error.classList.remove('hidden');
+      }
       currentJson = null;
       // 显示带行号的原始文本，高亮出错行
       const pos = /position\s+(\d+)/i.exec(e.message);
@@ -448,6 +466,13 @@
       queryInput.value = '';
       executeQuery();
     }
+  });
+
+  // Unicode 解码切换
+  btnUnicode.addEventListener('click', () => {
+    unicodeDecode = !unicodeDecode;
+    btnUnicode.classList.toggle('active', unicodeDecode);
+    if (lastRawText) formatJson(lastRawText);
   });
 
   // 在原始文本框中按 Ctrl+Enter 格式化
