@@ -214,6 +214,16 @@
     setTimeout(() => toast.classList.remove('show'), 1500);
   }
 
+  function formatTimestamp(value) {
+    let ms;
+    if (value >= 1e12 && value < 1e16) ms = value;
+    else if (value >= 1e9 && value < 1e11) ms = value * 1000;
+    else return null;
+    const d = new Date(ms);
+    if (isNaN(d.getTime())) return null;
+    return d.toLocaleString();
+  }
+
   // 渲染 JSON 值（递归）
   function renderValue(value, indent) {
     if (value === null) {
@@ -222,8 +232,11 @@
     switch (typeof value) {
       case 'string':
         return '<span class="json-string">"' + escapeHtml(value) + '"</span>';
-      case 'number':
+      case 'number': {
+        const ts = formatTimestamp(value);
+        if (ts) return '<span class="json-number json-timestamp" title="' + escapeHtml(ts) + '">' + value + '</span>';
         return '<span class="json-number">' + value + '</span>';
+      }
       case 'boolean':
         return '<span class="json-boolean">' + value + '</span>';
       case 'object':

@@ -325,6 +325,12 @@ body {
   color: var(--color-bracket);
 }
 
+.json-timestamp {
+  text-decoration: underline dotted var(--color-null);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
 .json-line-num {
   color: var(--color-null);
   user-select: none;
