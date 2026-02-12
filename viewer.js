@@ -221,7 +221,9 @@
     else return null;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return null;
-    return d.toLocaleString();
+    const local = d.toLocaleString() + ' (UTC' + (d.getTimezoneOffset() <= 0 ? '+' : '-') + String(Math.abs(d.getTimezoneOffset() / 60)).padStart(2, '0') + ':' + String(Math.abs(d.getTimezoneOffset() % 60)).padStart(2, '0') + ')';
+    const utc = d.toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' (UTC)');
+    return local + '\n' + utc;
   }
 
   // 渲染 JSON 值（递归）

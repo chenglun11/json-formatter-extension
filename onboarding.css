@@ -530,6 +530,14 @@ body {
   opacity: 0;
   transform: translateY(4px);
   animation: ts-tooltip-show 4s ease infinite;
+  text-align: center;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.demo-ts-utc {
+  color: var(--color-null);
+  font-size: 10px;
 }
 
 @keyframes ts-tooltip-show {
