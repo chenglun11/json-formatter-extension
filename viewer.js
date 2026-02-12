@@ -221,9 +221,20 @@
     else return null;
     const d = new Date(ms);
     if (isNaN(d.getTime())) return null;
-    const local = d.toLocaleString() + ' (UTC' + (d.getTimezoneOffset() <= 0 ? '+' : '-') + String(Math.abs(d.getTimezoneOffset() / 60)).padStart(2, '0') + ':' + String(Math.abs(d.getTimezoneOffset() % 60)).padStart(2, '0') + ')';
-    const utc = d.toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' (UTC)');
-    return local + '\n' + utc;
+    const fmt = (dt, utc) => {
+      const y = utc ? dt.getUTCFullYear() : dt.getFullYear();
+      const m = utc ? dt.getUTCMonth() + 1 : dt.getMonth() + 1;
+      const day = utc ? dt.getUTCDate() : dt.getDate();
+      const h = String(utc ? dt.getUTCHours() : dt.getHours()).padStart(2, '0');
+      const min = String(utc ? dt.getUTCMinutes() : dt.getMinutes()).padStart(2, '0');
+      const s = String(utc ? dt.getUTCSeconds() : dt.getSeconds()).padStart(2, '0');
+      return y + '/' + m + '/' + day + ' ' + h + ':' + min + ':' + s;
+    };
+    const offset = d.getTimezoneOffset();
+    const sign = offset <= 0 ? '+' : '-';
+    const oh = String(Math.abs(Math.floor(offset / 60))).padStart(2, '0');
+    const om = String(Math.abs(offset % 60)).padStart(2, '0');
+    return fmt(d, false) + ' (UTC' + sign + oh + ':' + om + ')\n' + fmt(d, true) + ' (UTC)';
   }
 
   // 渲染 JSON 值（递归）
