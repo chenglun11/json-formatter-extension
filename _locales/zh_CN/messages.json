@@ -113,6 +113,24 @@
   "onboardingCta": {
     "message": "开始使用"
   },
+  "onboardingFeature5Title": {
+    "message": "JSONPath 查询"
+  },
+  "onboardingFeature5Desc": {
+    "message": "内置 JSONPath 引擎，支持 $.key、..key、[*]、[0:3] 等语法，快速定位数据"
+  },
+  "onboardingFeature6Title": {
+    "message": "Unicode 自动解码"
+  },
+  "onboardingFeature6Desc": {
+    "message": "自动检测 \\u 转义序列并解码为可读字符，告别满屏乱码"
+  },
+  "onboardingFeature7Title": {
+    "message": "时间戳智能识别"
+  },
+  "onboardingFeature7Desc": {
+    "message": "自动识别 Unix 时间戳，鼠标悬停即可查看可读的本地时间"
+  },
   "btnQuery": {
     "message": "JSONPath"
   },

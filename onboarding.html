@@ -39,7 +39,6 @@
     </div>
     <!-- Card 2: Floating window -->
     <div class="card">
-      <div class="card-badge" data-i18n="onboardingNewBadge"></div>
       <h3 class="card-title" data-i18n="onboardingFeature2Title"></h3>
       <p class="card-desc" data-i18n="onboardingFeature2Desc"></p>
       <div class="card-demo demo-floating">
@@ -101,6 +100,48 @@
           <div class="demo-theme-line-l"></div>
           <div class="demo-theme-line-l short"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- Card 5: JSONPath query -->
+    <div class="card">
+      <div class="card-badge" data-i18n="onboardingNewBadge"></div>
+      <h3 class="card-title" data-i18n="onboardingFeature5Title"></h3>
+      <p class="card-desc" data-i18n="onboardingFeature5Desc"></p>
+      <div class="card-demo demo-jsonpath">
+        <div class="demo-query-bar">
+          <span class="demo-query-dollar">$</span><span class="demo-query-text">.store.book[0]</span>
+        </div>
+        <div class="demo-query-result">
+          <span class="demo-jb">{</span><br>
+          <span class="indent"><span class="demo-jk">"title"</span>: <span class="demo-js">"Hello"</span></span><br>
+          <span class="demo-jb">}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6: Unicode decode -->
+    <div class="card">
+      <div class="card-badge" data-i18n="onboardingNewBadge"></div>
+      <h3 class="card-title" data-i18n="onboardingFeature6Title"></h3>
+      <p class="card-desc" data-i18n="onboardingFeature6Desc"></p>
+      <div class="card-demo demo-unicode">
+        <div class="demo-unicode-before">\u4f60\u597d\u4e16\u754c</div>
+        <div class="demo-unicode-arrow">→</div>
+        <div class="demo-unicode-after">你好世界</div>
+      </div>
+    </div>
+
+    <!-- Card 7: Timestamp detection -->
+    <div class="card">
+      <div class="card-badge" data-i18n="onboardingNewBadge"></div>
+      <h3 class="card-title" data-i18n="onboardingFeature7Title"></h3>
+      <p class="card-desc" data-i18n="onboardingFeature7Desc"></p>
+      <div class="card-demo demo-timestamp">
+        <div class="demo-ts-line">
+          <span class="demo-jk">"created"</span>: <span class="demo-jn demo-ts-num">1707700000</span>
+        </div>
+        <div class="demo-ts-tooltip">2024/2/12 12:26:40</div>
       </div>
     </div>
   </div>

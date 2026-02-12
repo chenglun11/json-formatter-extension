@@ -396,6 +396,148 @@ body {
   100% { opacity: 0.3; }
 }
 
+/* === Demo 5: JSONPath query === */
+.demo-jsonpath {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.demo-query-bar {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--color-null);
+  padding: 4px 8px;
+  background: var(--bg-toolbar);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.demo-query-dollar {
+  color: var(--color-null);
+}
+
+.demo-query-text {
+  color: var(--text-title);
+  animation: query-type 4s steps(14) infinite;
+  display: inline-block;
+  overflow: hidden;
+  width: 0;
+  vertical-align: bottom;
+}
+
+@keyframes query-type {
+  0%, 10% { width: 0; }
+  30%, 75% { width: 100%; }
+  90%, 100% { width: 0; }
+}
+
+.demo-query-result {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: 0;
+  animation: query-result-show 4s ease infinite;
+}
+
+.demo-query-result .indent {
+  padding-left: 16px;
+}
+
+@keyframes query-result-show {
+  0%, 30% { opacity: 0; }
+  40%, 75% { opacity: 1; }
+  90%, 100% { opacity: 0; }
+}
+
+/* === Demo 6: Unicode decode === */
+.demo-unicode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.demo-unicode-before {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--color-null);
+  animation: unicode-fade 4s ease infinite;
+}
+
+.demo-unicode-arrow {
+  font-size: 18px;
+  color: var(--text-title);
+  animation: unicode-arrow 4s ease infinite;
+}
+
+.demo-unicode-after {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-string);
+  animation: unicode-pop 4s ease infinite;
+}
+
+@keyframes unicode-fade {
+  0%, 10% { opacity: 1; }
+  40%, 70% { opacity: 0.4; }
+  90%, 100% { opacity: 1; }
+}
+
+@keyframes unicode-arrow {
+  0%, 15% { opacity: 0; transform: translateX(-4px); }
+  30%, 70% { opacity: 1; transform: translateX(0); }
+  85%, 100% { opacity: 0; transform: translateX(-4px); }
+}
+
+@keyframes unicode-pop {
+  0%, 20% { opacity: 0; transform: scale(0.8); }
+  35%, 70% { opacity: 1; transform: scale(1); }
+  85%, 100% { opacity: 0; transform: scale(0.8); }
+}
+
+/* === Demo 7: Timestamp detection === */
+.demo-timestamp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.demo-ts-line {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
+}
+
+.demo-ts-num {
+  text-decoration: underline dotted var(--color-null);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+.demo-ts-tooltip {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 11px;
+  color: var(--text);
+  background: var(--bg-toolbar);
+  border: 1px solid var(--border-btn);
+  border-radius: 4px;
+  padding: 3px 10px;
+  opacity: 0;
+  transform: translateY(4px);
+  animation: ts-tooltip-show 4s ease infinite;
+}
+
+@keyframes ts-tooltip-show {
+  0%, 25% { opacity: 0; transform: translateY(4px); }
+  35%, 70% { opacity: 1; transform: translateY(0); }
+  85%, 100% { opacity: 0; transform: translateY(4px); }
+}
+
 /* === CTA button === */
 .cta-section {
   text-align: center;

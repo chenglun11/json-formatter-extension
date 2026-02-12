@@ -113,6 +113,24 @@
   "onboardingCta": {
     "message": "Get Started"
   },
+  "onboardingFeature5Title": {
+    "message": "JSONPath Query"
+  },
+  "onboardingFeature5Desc": {
+    "message": "Built-in JSONPath engine supporting $.key, ..key, [*], [0:3] and more to quickly locate data"
+  },
+  "onboardingFeature6Title": {
+    "message": "Auto Unicode Decode"
+  },
+  "onboardingFeature6Desc": {
+    "message": "Automatically detects \\u escape sequences and decodes them into readable characters"
+  },
+  "onboardingFeature7Title": {
+    "message": "Timestamp Detection"
+  },
+  "onboardingFeature7Desc": {
+    "message": "Automatically detects Unix timestamps — hover to see human-readable local time"
+  },
   "btnQuery": {
     "message": "JSONPath"
   },
